@@ -1,10 +1,10 @@
 //---------------------------------------------------------------------------//
-//                          SmartContractsRegistery
+//                          GlobalEthereumNamespace
 //  @author: Mohammed AAJAJI
 //  @email : mohammed.aajaji.freelance@gmail.com
 //  
-//      This contract aims to work as a registery for all existing smartcontracts
-//  on the Ethereum blockchain.
+//      This contract aims to work as a global namespace for all existing 
+//  smartcontracts on the Ethereum blockchain.
 //  Indeed, as there is no way today to update smartcontract code without
 //  redeploying it in a new address, this may break clients compatibility as
 //  these ones only rely on the contract address.
@@ -16,8 +16,11 @@
 
 
 /// @title 
-contract SmartContractsRegistery {
-    
+contract GlobalEthereumNamespace {
+
+    //------------------------------//
+    //          Parameters
+    //------------------------------//
     // The contract owner
     address owner;
     // The price in Wei(=1Eth) for registering a new contract.
@@ -26,6 +29,10 @@ contract SmartContractsRegistery {
     // The price in Wei(=0.25Eth) for updating the version of a registred contract.
     // If the ETH/USD goes too high, this parameter would be decreased.
     uint updatePrice = 250000000000000000;
+    
+    //------------------------------//
+    //      Namespace data
+    //------------------------------//
     // The smart contract information.
     struct Infos {
         address contractOwner;
@@ -37,12 +44,21 @@ contract SmartContractsRegistery {
     mapping (string => Infos) deployedContracts;
     // The existing contracts registered
     mapping (string => bool) existingContracts;
+    // Total number of registered contracts
+    uint totalRegisteredContracts;
 
+    //------------------------------//
+    //          Constructor
+    //------------------------------//
     // @dev Constructor of the SmartContracts registery
-    function SmartContractsRegistery(){
+    function GlobalEthereumNamespace(){
         owner = msg.sender;
+        totalRegisteredContracts = 0;
     }
 
+    //------------------------------//
+    //          Functions
+    //------------------------------//
     // @notice Function allowing to add a new smartcontract to the registery
     // @param _contractName : The public smartcontract name, this the identifier clients will use
     //                        to call your smartcontract
@@ -67,6 +83,7 @@ contract SmartContractsRegistery {
             lastUpdateTime : now
         });
         existingContracts[_contractName] = true;
+        totalRegisteredContracts++;
         return true;
     }
 
@@ -92,6 +109,20 @@ contract SmartContractsRegistery {
         return true;
     }
 
+    //@notice Function returning the last deployment Address of a smartcontract registered in this
+    //        GlobalEthereumNamespace
+    //@param _contractName : The public smartcontract name.
+    //@return _deploymentAddress : The public address of the last known version of the smartcontract.
+    function GetContract(string _contractName) 
+        Registred(_contractName)
+        returns(address _deploymentAddress)
+    {
+        return deployedContracts[_contractName].deploymentAddress;
+    }
+
+    //------------------------------//
+    //          Modifiers
+    //------------------------------//
     //Used to restrict registering if the caller doesn't have enough fund to pay for the service
     modifier PayRegister() { if(msg.value < registryPrice) throw; _ }
     //Used to restrict update if the caller doesn't have enough fund to pay for the service
@@ -104,4 +135,20 @@ contract SmartContractsRegistery {
     modifier OnlyContractOwner(string _contractName) {if(deployedContracts[_contractName].contractOwner != msg.sender) throw; _}
     //Used to restrict usage for non-owner callers
     modifier Owner() {if (msg.sender != owner) throw; _}
+
+
+    //------------------------------//
+    //    Namespace Data transfert
+    //------------------------------//
+    //@notice Function that wil transfert the data from this contract to it's updated version if any
+    function TransfertGENData(address _newVersioAddress) 
+        Owner()
+        returns(bool success)
+    {
+        uint i;
+        for(i=0; i<totalRegisteredContracts; i++)
+        {
+
+        }
+    }
 }
