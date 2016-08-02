@@ -135,20 +135,4 @@ contract GlobalEthereumNamespace {
     modifier OnlyContractOwner(string _contractName) {if(deployedContracts[_contractName].contractOwner != msg.sender) throw; _}
     //Used to restrict usage for non-owner callers
     modifier Owner() {if (msg.sender != owner) throw; _}
-
-
-    //------------------------------//
-    //    Namespace Data transfert
-    //------------------------------//
-    //@notice Function that wil transfert the data from this contract to it's updated version if any
-    function TransfertGENData(address _newVersioAddress) 
-        Owner()
-        returns(bool success)
-    {
-        uint i;
-        for(i=0; i<totalRegisteredContracts; i++)
-        {
-
-        }
-    }
 }
