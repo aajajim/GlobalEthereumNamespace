@@ -15,7 +15,7 @@
 //---------------------------------------------------------------------------//
 
 
-/// @title 
+/// @title Global Ethereum Namespace contract
 contract GlobalEthereumNamespace {
 
     //------------------------------//
@@ -154,4 +154,10 @@ contract GlobalEthereumNamespace {
     //------------------------------//
     event registerContract(string _contractName, address _deploymentAddress, string _version);
     event updateContract(string _contractName, address _newDeploymentAddress, string _newVersion);
+
+    //------------------------------//
+    //          Fallback
+    //------------------------------//
+    //@notice Fallback function: just throw an exception to stop execution.
+    function (){ throw; }
 }
