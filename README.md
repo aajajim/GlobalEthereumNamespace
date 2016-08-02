@@ -31,29 +31,39 @@ The contract is quiet simple to use, so that on the:
     - Register a new contract by calling:
         ```javascript
 
-        function RegisterContract(string _contractName, address _deploymentAddress, uint _version) returns (bool success)
+        function RegisterContract(string _contractName, address _deploymentAddress, string _abi, string _version) returns (bool success)
         ```
         Please make sure to test the return result to ensure that your contract has been correctly registered.
 
     - Update an existing contract by calling:
         ```javascript
 
-            function UpdateContract(string _contractName, address _newAddress, uint _newVersion) returns (bool success)
+            function UpdateContract(string _contractName, address _newAddress, string _abi, string _newVersion) returns (bool success)
         ```
         Please make sure to test the return result to ensure that your contract has been correctly updated.
 
 2. **Client side**:
-
-    The only things a client needs from the developer is the GlobalEthereumNamespace address and the smart contract public 
-    name. Let's assume this name is "MySmartContract", here is a JavaScript snippet using web3 library (using the TestNet address):
+The only things a client needs from the developer is the GlobalEthereumNamespace address and the smart contract public name. Let's assume this name is "MySmartContract", here is a JavaScript snippet using web3 library (using the TestNet address):
     
     ```javascript
-
-    var gen_abi = [{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_deploymentAddress","type":"address"},{"name":"_version","type":"string"}],"name":"RegisterContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetVersion","outputs":[{"name":"_version","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetContract","outputs":[{"name":"_deploymentAddress","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_newDeploymentAddress","type":"address"},{"name":"_newVersion","type":"string"}],"name":"UpdateContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_deploymentAddress","type":"address"},{"indexed":false,"name":"_version","type":"string"}],"name":"registerContract","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_newDeploymentAddress","type":"address"},{"indexed":false,"name":"_newVersion","type":"string"}],"name":"updateContract","type":"event"}]
-    var genContract = web3.eth.contarct(gen_abi)
-    var globalNamespace = genContract.at("")
-    //Next call will provide you the address of MySmartContract 
-    var developerContract = globalNamespace.GetContract("MySmartContract")
+    //Declare the next function in some global context in your code
+    function instantiateContract(contractName)
+    {
+        try{
+            var gen_abi = [{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_deploymentAddress","type":"address"},{"name":"_version","type":"string"}],"name":"RegisterContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetVersion","outputs":[{"name":"_version","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetContract","outputs":[{"name":"_deploymentAddress","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_newDeploymentAddress","type":"address"},{"name":"_newVersion","type":"string"}],"name":"UpdateContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_deploymentAddress","type":"address"},{"indexed":false,"name":"_version","type":"string"}],"name":"registerContract","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_newDeploymentAddress","type":"address"},{"indexed":false,"name":"_newVersion","type":"string"}],"name":"updateContract","type":"event"}];
+            var genContract = web3.eth.contarct(gen_abi);
+            var globalNamespace = genContract.at("");
+            var contractAddress = globalNamespace.GetContract("MySmartContract");
+            var contractABI = globalNamespace.GetABI("MySmartContract");
+            return web3.eth.contract(contractABI).at(contractAddress);
+        }catch(e)
+        {
+            throw Error 'Execution error : ' + e.error);
+        }
+        return null;
+    }
+    //Simply call it as follow
+    var myContract = instantiateContract("MySmartConrtact");
     ```
 
 ##Usage fees

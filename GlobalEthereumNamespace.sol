@@ -38,6 +38,7 @@ contract GlobalEthereumNamespace {
         address contractOwner;
         string version;
         address deploymentAddress;
+        string abi;
         uint lastUpdateTime;
     }
     // The registery of all deployed smart contracts with their latest address and version.
@@ -63,8 +64,9 @@ contract GlobalEthereumNamespace {
     // @param _contractName : The public smartcontract name, this the identifier clients will use
     //                        to call your smartcontract
     // @param _deploymentAddress : The address at which the smartcontract has been deployed
+    // @param _abi : The public interface of the smartcontract
     // @param _version : The version of you smartcontract 
-    function RegisterContract(string _contractName, address _deploymentAddress, string _version)
+    function RegisterContract(string _contractName, address _deploymentAddress, string _abi, string _version)
         PayRegister()
         NotRegistred(_contractName)
         returns(bool success)
@@ -80,6 +82,7 @@ contract GlobalEthereumNamespace {
             contractOwner : msg.sender,
             version : _version,
             deploymentAddress : _deploymentAddress,
+            abi : _abi,
             lastUpdateTime : now
         });
         existingContracts[_contractName] = true;
@@ -91,8 +94,9 @@ contract GlobalEthereumNamespace {
     // @notice Function allowing to update the address of an already registred smartcontract
     // @param _contractName : The public smartcontract name.
     // @param _newDeploymentAddress : The new address of the new version of the smartcontract
+    // @param _abi : The public interface of the smartcontract
     // @param _version : The new version of the smartcontract
-    function UpdateContract(string _contractName, address _newDeploymentAddress, string _newVersion)
+    function UpdateContract(string _contractName, address _newDeploymentAddress, string _abi, string _newVersion)
         PayUpdate()
         Registred(_contractName)
         OnlyContractOwner(_contractName)
@@ -104,8 +108,9 @@ contract GlobalEthereumNamespace {
             if(msg.sender.send(msg.value - updatePrice) == false) throw;
         }
         // Update contract address
-        deployedContracts[_contractName].deploymentAddress = _newDeploymentAddress;
         deployedContracts[_contractName].version = _newVersion;
+        deployedContracts[_contractName].deploymentAddress = _newDeploymentAddress;
+        deployedContracts[_contractName].abi = _abi;
         deployedContracts[_contractName].lastUpdateTime = now;
         updateContract(_contractName, _newDeploymentAddress, _newVersion);
         return true;
@@ -122,10 +127,21 @@ contract GlobalEthereumNamespace {
         return deployedContracts[_contractName].deploymentAddress;
     }
 
+    //@notice Function returning the last deployment Address of a smartcontract registered in this
+    //        GlobalEthereumNamespace
+    //@param _contractName : The public smartcontract name.
+    //@return _abi : The public interface of the last known version of the smartcontract.
+    function GetABI(string _contractName) 
+        Registred(_contractName)
+        returns(string _abi)
+    {
+        return deployedContracts[_contractName].abi;
+    }
+
     //@notice Function returning the latest version of a smartcontract registered in this
     //        GlobalEthereumNamespace
     //@param _contractName : The public smartcontract name.
-    //@return _deploymentAddress : The latest version of the last known version of the smartcontract.
+    //@return _version : The latest version of the last known version of the smartcontract.
     function GetVersion(string _contractName) 
         Registred(_contractName)
         returns(string _version)
