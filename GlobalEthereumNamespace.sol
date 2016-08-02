@@ -84,14 +84,15 @@ contract GlobalEthereumNamespace {
         });
         existingContracts[_contractName] = true;
         totalRegisteredContracts++;
+        registerContract(_contractName, _deploymentAddress, _version);
         return true;
     }
 
     // @notice Function allowing to update the address of an already registred smartcontract
     // @param _contractName : The public smartcontract name.
-    // @param _newAddress : The new address of the new version of the smartcontract
+    // @param _newDeploymentAddress : The new address of the new version of the smartcontract
     // @param _version : The new version of the smartcontract
-    function UpdateContract(string _contractName, address _newAddress, string _newVersion)
+    function UpdateContract(string _contractName, address _newDeploymentAddress, string _newVersion)
         PayUpdate()
         Registred(_contractName)
         OnlyContractOwner(_contractName)
@@ -103,9 +104,10 @@ contract GlobalEthereumNamespace {
             if(msg.sender.send(msg.value - updatePrice) == false) throw;
         }
         // Update contract address
-        deployedContracts[_contractName].deploymentAddress = _newAddress;
+        deployedContracts[_contractName].deploymentAddress = _newDeploymentAddress;
         deployedContracts[_contractName].version = _newVersion;
         deployedContracts[_contractName].lastUpdateTime = now;
+        updateContract(_contractName, _newDeploymentAddress, _newVersion);
         return true;
     }
 
@@ -146,4 +148,10 @@ contract GlobalEthereumNamespace {
     modifier OnlyContractOwner(string _contractName) {if(deployedContracts[_contractName].contractOwner != msg.sender) throw; _}
     //Used to restrict usage for non-owner callers
     modifier Owner() {if (msg.sender != owner) throw; _}
+    
+    //------------------------------//
+    //          Event
+    //------------------------------//
+    event registerContract(string _contractName, address _deploymentAddress, string _version);
+    event updateContract(string _contractName, address _newDeploymentAddress, string _newVersion);
 }
