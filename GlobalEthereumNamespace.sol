@@ -36,7 +36,7 @@ contract GlobalEthereumNamespace {
     // The smart contract information.
     struct Infos {
         address contractOwner;
-        uint version;
+        string version;
         address deploymentAddress;
         uint lastUpdateTime;
     }
@@ -64,7 +64,7 @@ contract GlobalEthereumNamespace {
     //                        to call your smartcontract
     // @param _deploymentAddress : The address at which the smartcontract has been deployed
     // @param _version : The version of you smartcontract 
-    function RegisterContract(string _contractName, address _deploymentAddress, uint _version)
+    function RegisterContract(string _contractName, address _deploymentAddress, string _version)
         PayRegister()
         NotRegistred(_contractName)
         returns(bool success)
@@ -91,7 +91,7 @@ contract GlobalEthereumNamespace {
     // @param _contractName : The public smartcontract name.
     // @param _newAddress : The new address of the new version of the smartcontract
     // @param _version : The new version of the smartcontract
-    function UpdateContract(string _contractName, address _newAddress, uint _newVersion)
+    function UpdateContract(string _contractName, address _newAddress, string _newVersion)
         PayUpdate()
         Registred(_contractName)
         OnlyContractOwner(_contractName)
@@ -118,6 +118,17 @@ contract GlobalEthereumNamespace {
         returns(address _deploymentAddress)
     {
         return deployedContracts[_contractName].deploymentAddress;
+    }
+
+    //@notice Function returning the latest version of a smartcontract registered in this
+    //        GlobalEthereumNamespace
+    //@param _contractName : The public smartcontract name.
+    //@return _deploymentAddress : The latest version of the last known version of the smartcontract.
+    function GetVersion(string _contractName) 
+        Registred(_contractName)
+        returns(string _version)
+    {
+        return deployedContracts[_contractName].version;
     }
 
     //------------------------------//
