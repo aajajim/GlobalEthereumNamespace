@@ -19,18 +19,20 @@ MainNet: 0x
 TestNet: 0x
 
 ##How yo use it ?
-The contract is quiet simple to use, so that on the :
+The contract is quiet simple to use, so that on the:
+
 1. Developer side:
-    -Register a new contract:
-        All you need is to call method
+
+    - Register a new contract by calling:
         ```
-            function RegisterContract(string _contractName, address _deploymentAddress, uint _version) returns (bool success)
+
+        function RegisterContract(string _contractName, address _deploymentAddress, uint _version) returns (bool success)
         ```
         Please make sure to test the return result to ensure that your contract has been correctly registered.
 
-    -Update an existing contract:
-        All you need is to call method
+    - Update an existing contract by calling:
         ```
+
             function UpdateContract(string _contractName, address _newAddress, uint _newVersion) returns (bool success)
         ```
         Please make sure to test the return result to ensure that your contract has been correctly updated.
@@ -38,10 +40,11 @@ The contract is quiet simple to use, so that on the :
 2. Client side:
     The only things a client needs from the developer is the GlobalEthereumNamespace address and the smart contract public 
     name. Let's assume this name is "MySmartContract", here is a JavaScript snippet using web3 library:
-    
+    ```
+
     var globalNamespace = web3.contarct("0x99999999999999999999999999999999999")
     var developerContract = globalNamespace.GetContract("MySmartContract")
-
+    ```
 ##Usage fees
 Registering a new contarct costs 1ETH
 Updating an existing contract consts 0.25ETH
