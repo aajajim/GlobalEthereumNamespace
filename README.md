@@ -16,7 +16,7 @@ necessary inforamtion about your contract: Name, Address, Version and Owner.
 This Global Ethereum Namespace contract is deployed both on the MainNet and on the TestNet.
 
 - **MainNet**: 0x
-- **TestNet**: 0x
+- **TestNet**: 0xe4c7514cf0caaa5c58d55f7616a79cec30c04228
 - **Contract's ABI**: 
     ```
 
@@ -52,7 +52,10 @@ The only things a client needs from the developer is the GlobalEthereumNamespace
         try{
             var gen_abi = [{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetVersion","outputs":[{"name":"_version","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetContract","outputs":[{"name":"_deploymentAddress","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_deploymentAddress","type":"address"},{"name":"_abi","type":"string"},{"name":"_version","type":"string"}],"name":"RegisterContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"}],"name":"GetABI","outputs":[{"name":"_abi","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_contractName","type":"string"},{"name":"_newDeploymentAddress","type":"address"},{"name":"_abi","type":"string"},{"name":"_newVersion","type":"string"}],"name":"UpdateContract","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_deploymentAddress","type":"address"},{"indexed":false,"name":"_version","type":"string"}],"name":"registerContract","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_contractName","type":"string"},{"indexed":false,"name":"_newDeploymentAddress","type":"address"},{"indexed":false,"name":"_newVersion","type":"string"}],"name":"updateContract","type":"event"}];
             var genContract = web3.eth.contarct(gen_abi);
+            //-------------------------------------------------------------------------------//
+            // /!\ Please note that the address used here is the TestNet address /!\
             var globalNamespace = genContract.at("0xe4c7514cf0caaa5c58d55f7616a79cec30c04228");
+            //-------------------------------------------------------------------------------//
             var contractAddress = globalNamespace.GetContract(contractName);
             var contractABI = globalNamespace.GetABI(contractName);
             return web3.eth.contract(contractABI).at(contractAddress);
