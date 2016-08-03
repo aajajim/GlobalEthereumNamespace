@@ -25,10 +25,10 @@ contract GlobalEthereumNamespace {
     address owner;
     // The price in Wei(=1Eth) for registering a new contract.
     // If the ETH/USD goes too high, this parameter would be decreased.
-    uint registryPrice = 1000000000000000000;
+    uint public registryPrice = 1000000000000000000;
     // The price in Wei(=0.25Eth) for updating the version of a registred contract.
     // If the ETH/USD goes too high, this parameter would be decreased.
-    uint updatePrice = 250000000000000000;
+    uint public updatePrice = 250000000000000000;
     
     //------------------------------//
     //      Namespace data
@@ -46,7 +46,7 @@ contract GlobalEthereumNamespace {
     // The existing contracts registered
     mapping (string => bool) existingContracts;
     // Total number of registered contracts
-    uint totalRegisteredContracts;
+    uint public totalRegisteredContracts;
 
     //------------------------------//
     //          Constructor
@@ -176,4 +176,12 @@ contract GlobalEthereumNamespace {
     //------------------------------//
     //@notice Fallback function: just throw an exception to stop execution.
     function (){ throw; }
+    
+    //@notice Fore testing purposes we need a kill function in order to destroy bad versions of the code
+    function kill() public
+        Owner()
+    {
+        suicide(owner);    
+    }       
+    
 }
