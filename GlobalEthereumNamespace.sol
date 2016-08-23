@@ -23,10 +23,10 @@ contract GlobalEthereumNamespace {
     //------------------------------//
     // The contract owner
     address owner;
-    // The price in Wei(=1Eth) for registering a new contract.
+    // The price in Wei(=1Ether) for registering a new contract.
     // If the ETH/USD goes too high, this parameter would be decreased.
     uint public registryPrice = 1000000000000000000;
-    // The price in Wei(=0.25Eth) for updating the version of a registred contract.
+    // The price in Wei(=0.25Ether) for updating the version of a registred contract.
     // If the ETH/USD goes too high, this parameter would be decreased.
     uint public updatePrice = 250000000000000000;
     
@@ -69,15 +69,13 @@ contract GlobalEthereumNamespace {
     function RegisterContract(string _contractName, address _deploymentAddress, string _abi, string _version)
         PayRegister()
         NotRegistred(_contractName)
-        returns(bool success)
     {
         // Get paiement for registering and send back additional ETH
         if(msg.value > registryPrice)
         {
             if(msg.sender.send(msg.value - registryPrice) == false) throw;
         }
-        // Add new contract in the register 
-        // Add new contract in the register 
+        // Add new contract to the registery 
         deployedContracts[_contractName] =  Infos({
             contractOwner : msg.sender,
             version : _version,
@@ -88,7 +86,6 @@ contract GlobalEthereumNamespace {
         existingContracts[_contractName] = true;
         totalRegisteredContracts++;
         registerContract(_contractName, _deploymentAddress, _version);
-        return true;
     }
 
     // @notice Function allowing to update the address of an already registred smartcontract
@@ -100,7 +97,6 @@ contract GlobalEthereumNamespace {
         PayUpdate()
         Registred(_contractName)
         OnlyContractOwner(_contractName)
-        returns(bool success)
     {
         // Get Paiement for update and send back additional ETH
         if(msg.value > updatePrice)
@@ -113,16 +109,26 @@ contract GlobalEthereumNamespace {
         deployedContracts[_contractName].abi = _abi;
         deployedContracts[_contractName].lastUpdateTime = now;
         updateContract(_contractName, _newDeploymentAddress, _newVersion);
-        return true;
+    }
+
+    //@notice Function returning all information of a smartcontract registered in this
+    //        GlobalEthereumNamespace
+    //@param _contractName : The public smartcontract name.
+    //@return _deploymentAddress : The public address of the last known version of the smartcontract.
+    function GetContract(string _contractName) 
+        Registred(_contractName)
+        public constant returns(address _deploymentAddress, string _abi, string _version)
+    {
+        return (deployedContracts[_contractName].deploymentAddress, deployedContracts[_contractName].abi, deployedContracts[_contractName].version);
     }
 
     //@notice Function returning the last deployment Address of a smartcontract registered in this
     //        GlobalEthereumNamespace
     //@param _contractName : The public smartcontract name.
     //@return _deploymentAddress : The public address of the last known version of the smartcontract.
-    function GetContract(string _contractName) 
+    function GetAddress(string _contractName) 
         Registred(_contractName)
-        returns(address _deploymentAddress)
+        public constant returns(address _deploymentAddress)
     {
         return deployedContracts[_contractName].deploymentAddress;
     }
@@ -133,7 +139,7 @@ contract GlobalEthereumNamespace {
     //@return _abi : The public interface of the last known version of the smartcontract.
     function GetABI(string _contractName) 
         Registred(_contractName)
-        returns(string _abi)
+        public constant returns(string _abi)
     {
         return deployedContracts[_contractName].abi;
     }
@@ -144,10 +150,28 @@ contract GlobalEthereumNamespace {
     //@return _version : The latest version of the last known version of the smartcontract.
     function GetVersion(string _contractName) 
         Registred(_contractName)
-        returns(string _version)
+        public constant returns(string _version)
     {
         return deployedContracts[_contractName].version;
     }
+
+    //@notice Withdraw some amount of Ether in the contract to some address, the withdraw is intended
+    //        to be done to the Ethereum Classic Foundation address when one will be created in order
+    //        to support further developements of the foundation.
+    //@param _to : The address of the foundation
+    //@param _amount: The amount to be withdrawn
+    //@return success : Result of the send operation   
+    function Withdraw(address _to, uint _amount)
+        Owner()
+        returns(bool success)
+    {
+        if((_amount > this.balance) || !_to.send(_amount) )
+        {
+            return false;
+        }
+        return true;
+    }
+
 
     //------------------------------//
     //          Modifiers
@@ -177,11 +201,10 @@ contract GlobalEthereumNamespace {
     //@notice Fallback function: just throw an exception to stop execution.
     function (){ throw; }
     
-    //@notice Fore testing purposes we need a kill function in order to destroy bad versions of the code
+    //@notice For testing purposes we need a kill function in order to destroy bad versions of the code
     function kill() public
         Owner()
     {
         suicide(owner);    
     }       
-    
 }
