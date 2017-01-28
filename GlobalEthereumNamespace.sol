@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------//
 
+pragma solidity ^0.4.8;
 
 /// @title Global Ethereum Namespace contract
 contract GlobalEthereumNamespace {
@@ -69,6 +70,7 @@ contract GlobalEthereumNamespace {
     function RegisterContract(string _contractName, address _deploymentAddress, string _abi, string _version)
         PayRegister()
         NotRegistred(_contractName)
+        payable
     {
         // Get paiement for registering and send back additional ETH
         if(msg.value > registryPrice)
@@ -97,6 +99,7 @@ contract GlobalEthereumNamespace {
         PayUpdate()
         Registred(_contractName)
         OnlyContractOwner(_contractName)
+        payable
     {
         // Get Paiement for update and send back additional ETH
         if(msg.value > updatePrice)
@@ -177,17 +180,17 @@ contract GlobalEthereumNamespace {
     //          Modifiers
     //------------------------------//
     //Used to restrict registering if the caller doesn't have enough fund to pay for the service
-    modifier PayRegister() { if(msg.value < registryPrice) throw; _ }
+    modifier PayRegister() { if(msg.value < registryPrice) throw; _;}
     //Used to restrict update if the caller doesn't have enough fund to pay for the service
-    modifier PayUpdate() { if(msg.value < updatePrice) throw; _ }
+    modifier PayUpdate() { if(msg.value < updatePrice) throw; _; }
     //Used to restrict usage only for registred contracts
-    modifier Registred(string _contractName) { if(!existingContracts[_contractName]) throw; _}
+    modifier Registred(string _contractName) { if(!existingContracts[_contractName]) throw; _;}
     //Used to restrict usage only for new contracts
-    modifier NotRegistred(string _contractName) { if(existingContracts[_contractName]) throw; _}
+    modifier NotRegistred(string _contractName) { if(existingContracts[_contractName]) throw; _;}
     //Used to restrict updates to only the owner of the smartcontract
-    modifier OnlyContractOwner(string _contractName) {if(deployedContracts[_contractName].contractOwner != msg.sender) throw; _}
+    modifier OnlyContractOwner(string _contractName) {if(deployedContracts[_contractName].contractOwner != msg.sender) throw; _;}
     //Used to restrict usage for non-owner callers
-    modifier Owner() {if (msg.sender != owner) throw; _}
+    modifier Owner() {if (msg.sender != owner) throw; _;}
     
     //------------------------------//
     //          Event
@@ -201,7 +204,7 @@ contract GlobalEthereumNamespace {
     //@notice Fallback function: just throw an exception to stop execution.
     function (){ throw; }
     
-    //@notice For testing purposes we need a kill function in order to destroy bad versions of the code
+    //@notice Fore testing purposes we need a kill function in order to destroy bad versions of the code
     function kill() public
         Owner()
     {
